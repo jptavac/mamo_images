@@ -251,7 +251,23 @@ def expand_image_borders(arr, expanded_height=3481, expanded_width=2746, resize_
 
 ################################################################################
 
-def complete_mammo_mask_preprocessing(arr, mask_arr, contour_threshold=20, width_darken = 0.01, height_darken=0.03, pectoral_threshold=70, pectoral_angle=70, expanded_height=3481, expanded_width=2746, resize_percentage=0.3, mask_threshold = 50, normalized=False):
+def fill_mask(mask_bin):
+#Returns the largest contour of the input mask filled.
+
+    try:
+        [contours, contour_hierarchy] = cv2.findContours(mask_bin, mode=cv2.RETR_CCOMP , method=cv2.CHAIN_APPROX_NONE)  
+        # Get the largest contour index.
+        largest_contour_index = get_largest_contour_index(contours)
+        # Generate a black base image for contour with the same shape as the passed image.
+        largest_contour_mask = generate_black_background(mask_bin)  
+        cv2.drawContours(image=largest_contour_mask, contours=[contours[largest_contour_index]], contourIdx=-1, color=(255), thickness=-1)
+        return largest_contour_mask
+    except:
+        return mask_bin
+
+################################################################################
+
+def complete_mammo_mask_preprocessing(arr, mask_arr, contour_threshold=20, width_darken = 0.01, height_darken=0.03, pectoral_threshold=70, pectoral_angle=70, expanded_height=3481, expanded_width=2746, resize_percentage=0.3, mask_threshold = 0, normalized=False):
 # Performs complete mammogram segmentation. Rotates image if needed, identifies 
 # and segments breast tissue and eliminates the pectoral muscle and other labels. 
 # Then resizes image and expands borders to desired shape. The expanded borders 
@@ -290,25 +306,12 @@ def complete_mammo_mask_preprocessing(arr, mask_arr, contour_threshold=20, width
     mammo_flipped, mask_flipped       = mammo_mask_flip_to_point_right(arr, mask_arr)
     segmented_breast                  = largest_contour_segmenting_based_in_pixel_luminancy_threshold(mammo_flipped, contour_threshold, width_darken, height_darken, normalized)
     segmented_breast_without_pectoral = expand_image_borders(crop_pectoral(segmented_breast, threshold=pectoral_threshold, pectoral_angle=pectoral_angle), expanded_height=expanded_height, expanded_width=expanded_width, resize_percentage=resize_percentage)    
+    
     binarized_mask = binarize_with_threshold(mask_flipped, mask_threshold)
-    expanded_mask = expand_image_borders(binarized_mask, expanded_height=expanded_height, expanded_width=expanded_width, resize_percentage=resize_percentage)
-    return (segmented_breast_without_pectoral, fill_mask(expanded_mask))
-
-################################################################################
-
-def fill_mask(mask_bin):
-#Returns the largest contour of the input mask filled.
-
-    try:
-        [contours, contour_hierarchy] = cv2.findContours(mask_bin, mode=cv2.RETR_CCOMP , method=cv2.CHAIN_APPROX_NONE)  
-        # Get the largest contour index.
-        largest_contour_index = get_largest_contour_index(contours)
-        # Generate a black base image for contour with the same shape as the passed image.
-        largest_contour_mask = generate_black_background(mask_bin)  
-        cv2.drawContours(image=largest_contour_mask, contours=[contours[largest_contour_index]], contourIdx=-1, color=(255), thickness=-1)
-        return largest_contour_mask
-    except:
-        return mask_bin
+    filled_mask    = fill_mask(binarized_mask)
+    expanded_mask  = expand_image_borders(filled_mask, expanded_height=expanded_height, expanded_width=expanded_width, resize_percentage=resize_percentage)
+    
+    return (segmented_breast_without_pectoral, expanded_mask)
 
 ################################################################################
 
