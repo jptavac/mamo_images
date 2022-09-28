@@ -155,7 +155,7 @@ def largest_contour_segmenting_based_in_pixel_luminancy_threshold(image_array, b
     # Generate a black base image for contour with the same shape as the passed image.
     largest_contour_mask = generate_black_background(image_dark_sides)  
     # Generate a binary mask based on the largest contour.
-    cv2.drawContours(image=largest_contour_mask, contours=[contours[largest_contour_index]], contourIdx=-1, color=(255), thickness=-1)
+    cv2.drawContours(image=largest_contour_mask.tolist(), contours=[contours[largest_contour_index]], contourIdx=-1, color=(255), thickness=-1)
     # Obtain segmented image.
     image_segmented = apply_mask(image_array, largest_contour_mask)
 
