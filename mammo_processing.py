@@ -149,7 +149,7 @@ def largest_contour_segmenting_based_in_pixel_luminancy_threshold(image_array, b
     #Binarize image for contour recognition.
     image_bin = binarize_with_threshold(image_dark_sides, bin_threshold, normalized)   
     # Identify binarized image contours.
-    [contours, contour_hierarchy] = cv2.findContours(image_bin.tolist(), mode=cv2.RETR_CCOMP , method=cv2.CHAIN_APPROX_NONE)  
+    [contours, contour_hierarchy] = cv2.findContours(np.array(image_bin), mode=cv2.RETR_CCOMP , method=cv2.CHAIN_APPROX_NONE)  
     # Get the largest contour index.
     largest_contour_index = get_largest_contour_index(contours)
     # Generate a black base image for contour with the same shape as the passed image.
