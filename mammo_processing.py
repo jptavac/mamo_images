@@ -383,3 +383,22 @@ def generate_lacunarity_dimension_map(arr, lacunarity_window=32, lacunarity_boxe
             lacunarity_dim_map[y_index +side_padding, x_index +side_padding] = lac.Lacunarity.compute(snippet, lacunarity_boxes)[0]
 
     return lacunarity_dim_map
+
+################################################################################
+
+def apply_clahe_norm(img, clip=10.0, tile=(8, 8)):
+
+    img = cv2.normalize(
+        img,
+        None,
+        alpha=0,
+        beta=255,
+        norm_type=cv2.NORM_MINMAX,
+        dtype=cv2.CV_32F,
+    )
+    img_uint8 = img.astype("uint8")
+
+    clahe_create = cv2.createCLAHE(clipLimit=clip, tileGridSize=tile)
+    clahe_img = clahe_create.apply(img_uint8)
+
+    return clahe_img
