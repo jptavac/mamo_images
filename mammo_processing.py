@@ -242,7 +242,7 @@ def complete_mammogram_preprocessing(arr, contour_threshold=20, width_darken = 0
 
 ################################################################################
 
-def complete_mammo_mask_preprocessing(arr, mask_arr, contour_threshold=20, width_darken = 0.01, height_darken=0.03, pectoral_threshold=70, pectoral_angle=70, expanded_height=3481, expanded_width=2746, resize_percentage=0.3, mask_threshold = 50, return_filled_mask=True):
+def complete_mammo_mask_preprocessing(arr, mask_arr, contour_threshold=20, width_darken = 0.01, height_darken=0.03, pectoral_threshold=70, pectoral_angle=70, expanded_height=3481, expanded_width=2746, resize_percentage=0.3, mask_threshold = 50):
 #Performs complete mammogram segmentation. Rotates image if needed, identifies 
 #and segments breast tissue and eliminates the pectoral muscle and other labels. 
 #Then resizes image and expands borders to desired shape. The expanded borders 
@@ -283,7 +283,7 @@ def complete_mammo_mask_preprocessing(arr, mask_arr, contour_threshold=20, width
     segmented_breast_without_pectoral = expand_image_borders(crop_pectoral(segmented_breast, threshold=pectoral_threshold, pectoral_angle=pectoral_angle), expanded_height=expanded_height, expanded_width=expanded_width, resize_percentage=resize_percentage)    
     binarized_mask = array_binarize_with_threshold(mask_flipped, mask_threshold)
     filled_mask = expand_image_borders(fill_mask(binarized_mask), expanded_height=expanded_height, expanded_width=expanded_width, resize_percentage=resize_percentage)
-    return (segmented_breast_without_pectoral, fill_mask(filled_mask))
+    return (segmented_breast_without_pectoral, filled_mask)
 
 ################################################################################
 
