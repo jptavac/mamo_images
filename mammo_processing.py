@@ -281,12 +281,9 @@ def complete_mammo_mask_preprocessing(arr, mask_arr, contour_threshold=20, width
     mammo_flipped, mask_flipped       = mammo_mask_flip_to_point_right(arr, mask_arr)
     segmented_breast                  = largest_contour_segmenting_based_in_pixel_luminancy_threshold(mammo_flipped, contour_threshold, width_darken, height_darken)
     segmented_breast_without_pectoral = expand_image_borders(crop_pectoral(segmented_breast, threshold=pectoral_threshold, pectoral_angle=pectoral_angle), expanded_height=expanded_height, expanded_width=expanded_width, resize_percentage=resize_percentage)    
-    binarized_mask = expand_image_borders(array_binarize_with_threshold(mask_flipped, mask_threshold), expanded_height=expanded_height, expanded_width=expanded_width, resize_percentage=resize_percentage)
-
-    if return_filled_mask==True:
-        return (segmented_breast_without_pectoral, fill_mask(binarized_mask))
-    else:
-        return (segmented_breast_without_pectoral, binarized_mask)
+    binarized_mask = mp.array_binarize_with_threshold(mask_flipped, mask_threshold)
+    filled_mask = mp.expand_image_borders(mp.fill_mask(binarized_mask), expanded_height=expanded_height, expanded_width=expanded_width, resize_percentage=resize_percentage)
+    return (segmented_breast_without_pectoral, mp.fill_mask(filled_mask))
 
 ################################################################################
 
