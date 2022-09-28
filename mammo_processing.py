@@ -290,7 +290,7 @@ def complete_mammo_mask_preprocessing(arr, mask_arr, contour_threshold=20, width
     mammo_flipped, mask_flipped       = mammo_mask_flip_to_point_right(arr, mask_arr)
     segmented_breast                  = largest_contour_segmenting_based_in_pixel_luminancy_threshold(mammo_flipped, contour_threshold, width_darken, height_darken, normalized)
     segmented_breast_without_pectoral = expand_image_borders(crop_pectoral(segmented_breast, threshold=pectoral_threshold, pectoral_angle=pectoral_angle), expanded_height=expanded_height, expanded_width=expanded_width, resize_percentage=resize_percentage)    
-    binarized_mask = array_binarize_with_threshold(mask_flipped, mask_threshold)
+    binarized_mask = binarize_with_threshold(mask_flipped, mask_threshold)
     filled_mask = expand_image_borders(fill_mask(binarized_mask), expanded_height=expanded_height, expanded_width=expanded_width, resize_percentage=resize_percentage)
     return (segmented_breast_without_pectoral, filled_mask)
 
@@ -302,9 +302,9 @@ def fill_mask(mask_bin):
     try:
         [contours, contour_hierarchy] = cv2.findContours(mask_bin, mode=cv2.RETR_CCOMP , method=cv2.CHAIN_APPROX_NONE)  
         # Get the largest contour index.
-        largest_contour_index = mp.get_largest_contour_index(contours)
+        largest_contour_index = get_largest_contour_index(contours)
         # Generate a black base image for contour with the same shape as the passed image.
-        largest_contour_mask = mp.array_generate_black_background(mask_bin)  
+        largest_contour_mask = generate_black_background(mask_bin)  
         cv2.drawContours(image=largest_contour_mask, contours=[contours[largest_contour_index]], contourIdx=-1, color=(255), thickness=-1)
         return largest_contour_mask
     except:
@@ -346,7 +346,7 @@ def fractal_dimension(Z, threshold=0.5):
 
 ################################################################################
 
-def array_generate_fractal_dimension_map(arr, fractal_window=11, binarization_threshold = 0.5):
+def generate_fractal_dimension_map(arr, fractal_window=11, binarization_threshold = 0.5):
  # Compute fractal dimension map for a square numpy array.
     fractal_dim_map = np.zeros(arr.shape)
     side_padding    = int(fractal_window/2)
@@ -359,7 +359,7 @@ def array_generate_fractal_dimension_map(arr, fractal_window=11, binarization_th
 
 ################################################################################
 
-def array_eliminate_most_common_element(arr):
+def eliminate_most_common_element(arr):
 # Used for cleaning fractal dimension map background.    
     new_arr = np.copy(arr)
     u, c = np.unique(new_arr, return_counts=True)
@@ -369,7 +369,7 @@ def array_eliminate_most_common_element(arr):
 
 ################################################################################
 
-def array_generate_lacunarity_dimension_map(arr, lacunarity_window=32, lacunarity_boxes=(8,8)):
+def generate_lacunarity_dimension_map(arr, lacunarity_window=32, lacunarity_boxes=(8,8)):
 # Compute lacunarity map for a square numpy array.
     lacunarity_dim_map = np.zeros(arr.shape)
     side_padding    = int(lacunarity_window/2)
