@@ -296,9 +296,9 @@ def fill_mask(mask_bin):
     try:
         [contours, contour_hierarchy] = cv2.findContours(mask_bin, mode=cv2.RETR_CCOMP , method=cv2.CHAIN_APPROX_NONE)  
         # Get the largest contour index.
-        largest_contour_index = mp.get_largest_contour_index(contours)
+        largest_contour_index = get_largest_contour_index(contours)
         # Generate a black base image for contour with the same shape as the passed image.
-        largest_contour_mask = mp.array_generate_black_background(mask_bin)  
+        largest_contour_mask = array_generate_black_background(mask_bin)  
         cv2.drawContours(image=largest_contour_mask, contours=[contours[largest_contour_index]], contourIdx=-1, color=(255), thickness=-1)
         return largest_contour_mask
     except:
